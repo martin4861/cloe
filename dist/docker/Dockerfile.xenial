@@ -6,7 +6,7 @@ ARG VTD_IMAGE=scratch
 FROM ${VTD_IMAGE} AS vtd
 WORKDIR /vtd
 
-FROM ubuntu:16.04
+FROM ubuntu:16.04 as cloe-base
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -91,9 +91,14 @@ RUN conan profile new --detect default && \
     conan profile update settings.compiler.libcxx=libstdc++11 default && \
     conan profile update env.PATH="[$PYENV_ROOT/shims,$PYENV_ROOT/bin]" default
 
+# Add Conan cache directory for named volume mount in devcontainer
+RUN cp -r /root/.conan /tmp/ \
+    && chmod -R a=rwx /tmp/.conan
+
 ENV CONAN_NON_INTERACTIVE=yes
 
 # Build and Install Cloe
+FROM cloe-base as cloe-build
 WORKDIR /cloe
 ARG WITH_VTD=0
 

@@ -16,9 +16,10 @@ DOCKER_NETWORK := \
 		fi \
 	)
 
-IMAGE_BASE := cloe/cloe-engine
+IMAGE_BASE := cloe
 IMAGE_VERSION := ${PROJECT_VERSION}
-DOCKER_IMAGE := ${IMAGE_BASE}:${IMAGE_VERSION}
+DOCKER_IMAGE := ${IMAGE_BASE}/cloe-engine:${IMAGE_VERSION}
+DOCKER_IMAGE_BUILD_ENV := ${IMAGE_BASE}/build-env:${IMAGE_VERSION}
 DOCKER_CONTEXT := ${PROJECT_ROOT}
 
 # Default build arguments
@@ -101,6 +102,16 @@ ubuntu-20.04: Dockerfile.focal
 archlinux: Dockerfile.archlinux
 	@echo ===================================================================================
 	${DOCKER} build -f $< ${DOCKER_ARGS} -t ${DOCKER_IMAGE}-$@ ${DOCKER_CONTEXT}
+
+.PHONY: ubuntu-18.04-build-env
+ubuntu-18.04-build-env: Dockerfile.bionic
+	@echo ===================================================================================
+	${DOCKER} build --target cloe-base -f $< ${DOCKER_ARGS} -t ${DOCKER_IMAGE_BUILD_ENV}-ubuntu-18.04 ${DOCKER_CONTEXT}
+
+.PHONY: ubuntu-20.04-build-env
+ubuntu-20.04-build-env: Dockerfile.focal
+	@echo ===================================================================================
+	${DOCKER} build --target cloe-base -f $< ${DOCKER_ARGS} -t ${DOCKER_IMAGE_BUILD_ENV}-ubuntu-20.04 ${DOCKER_CONTEXT}
 
 release:
 	@test -f setup.sh || echo 'Error: require setup.sh for user authentication'
