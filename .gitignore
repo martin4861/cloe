@@ -33,3 +33,4 @@ callgrind.out.*
 # Miscellaneous
 *.log
 /.gtm/
+.vagrant/
