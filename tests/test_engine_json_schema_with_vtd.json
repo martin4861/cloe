@@ -1281,6 +1281,13 @@
                     "description": "VTD scenario to use (project must already be loaded)",
                     "type": "string"
                   },
+                  "scp_actions": {
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "predefined SCP actions for use by action trigger",
+                    "type": "object"
+                  },
                   "sensor_initial_port": {
                     "description": "initial port for sensor communication",
                     "maximum": 65535,
