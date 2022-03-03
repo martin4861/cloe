@@ -29,5 +29,10 @@ Vagrant.configure("2") do |config|
     sudo -u vagrant conan profile new --detect default
     sudo -u vagrant conan profile update settings.build_type=RelWithDebInfo default
     sudo -u vagrant conan profile update settings.compiler.libcxx=libstdc++11 default
+
+    # Run any other provisioning script we find
+    if [[ -f /vagrant/Vagrant.provision ]]; then
+      sudo -u vagrant /vagrant/Vagrant.provision
+    fi
   EOF
 end
