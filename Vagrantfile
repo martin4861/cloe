@@ -23,7 +23,9 @@ Vagrant.configure("2") do |config|
     pip3 install --upgrade pip
     make -f /vagrant/Makefile.setup \
       PIP_INSTALL_ARGS="" \
-      install-python-deps
+      install-python-deps \
+      install-sphinx-deps \
+      install-python-tools
 
     # Setup Conan
     sudo -u vagrant conan profile new --detect default
