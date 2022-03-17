@@ -36,8 +36,12 @@ test_vtd_plugin_exists() {
     # are not reproducible, so we need to rewrite them and delete these lines.
     # This does not negatively affect the validity of the test.
     diff <(cloe_engine dump config_nop_smoketest.json |
-        sed -r -e 's#"/(home|root).*.conan/data/([^/]+)/.*"#"/.../\2/.../"#' -e '/\/(home|root)\/.*/d') \
-           test_engine_nop_smoketest_dump.json
+        sed -r \
+            -e 's#"/(home|root).*.conan/data/([^/]+)/.*",?#"/.../\2/.../",#' \
+            -e '/\/(home|root)\/.*/d' \
+            -e '/cloe-plugin-vtd/d' \
+        ) \
+        test_engine_nop_smoketest_dump.json
 }
 
 @test "$(testname "Expect check success" "test_engine_smoketest.json" "20c3f11e-4a93-4066-b61e-d485be5c8979")" {

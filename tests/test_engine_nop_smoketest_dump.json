@@ -37,7 +37,7 @@
       "/.../cloe-plugin-mocks/.../",
       "/.../cloe-plugin-noisy-sensor/.../",
       "/.../cloe-plugin-speedometer/.../",
-      "/.../cloe-plugin-virtue/.../"
+      "/.../cloe-plugin-virtue/.../",
     ],
     "plugins": {
       "allow_clobber": true,
