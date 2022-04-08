@@ -18,9 +18,10 @@ class Fable(ConanFile):
         "fPIC": True,
         "test": True,
     }
-    generators = "cmake"
+    generators = "CMakeDeps"
     no_copy_source = True
     exports_sources = [
+        "cmake/*",
         "include/*",
         "examples/*",
         "src/*",

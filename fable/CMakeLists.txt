@@ -5,9 +5,9 @@ project(fable LANGUAGES CXX)
 set(target fable)
 set(alias fable::fable)
 
-# Conan / Editor -----------------------------------------------------
-include(${CMAKE_CURRENT_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup(TARGETS)
+find_package(Boost REQUIRED)
+find_package(fmt REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 # Library ------------------------------------------------------------
 add_library(${target}
@@ -30,13 +30,14 @@ set_target_properties(${target} PROPERTIES
 )
 target_include_directories(${target}
   PUBLIC
-    include
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
 )
 target_link_libraries(${target}
   PUBLIC
-    CONAN_PKG::boost
-    CONAN_PKG::fmt
-    CONAN_PKG::nlohmann_json
+    boost::boost
+    fmt::fmt
+    nlohmann_json::nlohmann_json
 )
 
 # Testing ------------------------------------------------------------
@@ -44,6 +45,7 @@ option(BuildTests "Build tests?" ON)
 if(BuildTests)
     message(STATUS "-> Enable testing")
     enable_testing()
+    find_package(GTest REQUIRED)
     include(GoogleTest)
 
     add_executable(test-fable
@@ -64,8 +66,8 @@ if(BuildTests)
         CXX_STANDARD_REQUIRED ON
     )
     target_link_libraries(test-fable
-        CONAN_PKG::gtest
-        CONAN_PKG::boost
+        gtest::gtest
+        boost::boost
         ${target}
     )
     gtest_add_tests(TARGET test-fable)
@@ -73,7 +75,8 @@ endif()
 
 option(BuildExamples "Build examples?" ${BuildTests})
 if(BuildExamples)
-    message(STATUS "-> Build examples")
+message(STATUS "-> Build examples")
+    find_package(cli11 REQUIRED)
     add_executable(example-contacts
         examples/contacts/src/main.cpp
     )
@@ -82,7 +85,7 @@ if(BuildExamples)
         CXX_STANDARD_REQUIRED ON
     )
     target_link_libraries(example-contacts
-        CONAN_PKG::cli11
+        cli11::cli11
         ${target}
     )
 
@@ -94,20 +97,40 @@ if(BuildExamples)
         CXX_STANDARD_REQUIRED ON
     )
     target_link_libraries(example-simple-config
-        CONAN_PKG::cli11
+        cli11::cli11
         ${target}
     )
 endif()
 
 # Installation -------------------------------------------------------
 include(GNUInstallDirs)
-install(TARGETS ${target}
-    LIBRARY
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
+
+# install the target related to export-set
+install(TARGETS fable EXPORT fableTargets)
+
 install(
     DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+# Install all exported targets
+install(EXPORT fableTargets
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/fable
+    NAMESPACE fable::
+)
+
+include(CMakePackageConfigHelpers)
+# create config file
+configure_package_config_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cfg/pkg/Config.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/fableConfig.cmake"
+    INSTALL_DESTINATION cmake
+)
+
+# install config files
+install(
+    FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/fableConfig.cmake"
+    DESTINATION lib/cmake/fable
+    COMPONENT "cmake"
 )
